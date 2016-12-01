@@ -31,7 +31,7 @@ named!(pub minus<Node>,      do_parse!(tag_bf!("-") >> (Node::Dec)));
 named!(pub dot<Node>,        do_parse!(tag_bf!(".") >> (Node::PutCh)));
 named!(pub comma<Node>,      do_parse!(tag_bf!(",") >> (Node::GetCh)));
 named!(parse_loop<Node>, do_parse!(tag_bf!("[") >> block: map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| From::from(nodes)) >> (Node::Loop(block))));
-named!(node<Node>,       do_parse!(node: alt!(lshift | rshift | plus | minus | dot | comma | parse_loop) >> (node)));
+named!(node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
 pub fn parse(i: &[u8]) -> Result<Block, ErrorKind<u32>> {
     map!(i, many0!(node), From::from).to_result()
