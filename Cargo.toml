@@ -1,6 +1,6 @@
 [package]
 name          = "brainfuck_rs"
-version       = "0.2.0"
+version       = "0.3.0"
 authors       = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description   = "brainfuck parser using nom"
 repository    = "https://github.com/Keruspe/brainfuck.rs"
