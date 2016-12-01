@@ -1,3 +1,5 @@
+extern crate nom;
+
 use nom::IResult;
 
 pub fn skip_unknown(i: &[u8]) -> IResult<&[u8], &[u8]> {
@@ -21,6 +23,10 @@ macro_rules! strip_unknown (
         sep!($i, skip_unknown, $($args)*)
     });
 );
+
+fn main() {
+
+}
 
 #[cfg(test)]
 mod tests {
