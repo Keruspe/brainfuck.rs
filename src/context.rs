@@ -27,7 +27,7 @@ impl Context {
         self.get().map(|e| *e != 0).unwrap_or(false)
     }
 
-    pub fn run(&mut self, node: &Node) {
+    fn run_node(&mut self, node: &Node) {
         match *node {
             Node::LShift => {
                 self.index -= 1;
@@ -63,10 +63,16 @@ impl Context {
             Node::Loop(ref nodes) => {
                 while self.loop_cond() {
                     for node in nodes {
-                        self.run(node);
+                        self.run_node(node);
                     }
                 }
             },
+        }
+    }
+
+    pub fn run(&mut self, nodes: &Vec<Node>) {
+        for node in nodes {
+            self.run_node(node);
         }
     }
 }

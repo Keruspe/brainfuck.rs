@@ -90,6 +90,10 @@ pub fn parse_node(i: &[u8]) -> IResult<&[u8], Node> {
     }
 }
 
+pub fn parse(i: &[u8]) -> Result<Vec<Node>, ErrorKind<u32>> {
+    many0!(i, parse_node).to_result()
+}
+
 #[cfg(test)]
 mod tests {
     use nom::IResult;
