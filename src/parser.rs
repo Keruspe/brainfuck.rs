@@ -30,7 +30,7 @@ named!(pub plus<Node>,       do_parse!(tag_bf!("+") >> (Node::Inc)));
 named!(pub minus<Node>,      do_parse!(tag_bf!("-") >> (Node::Dec)));
 named!(pub dot<Node>,        do_parse!(tag_bf!(".") >> (Node::PutCh)));
 named!(pub comma<Node>,      do_parse!(tag_bf!(",") >> (Node::GetCh)));
-named!(parse_loop<Node>, preceded!(tag_bf!("["), map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| Node::Loop(From::from(nodes)))));
+named!(pub parse_loop<Node>, preceded!(tag_bf!("["), map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| Node::Loop(From::from(nodes)))));
 named!(node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
 pub fn parse(i: &[u8]) -> Result<Block, ErrorKind<u32>> {
@@ -86,5 +86,22 @@ mod tests {
         assert_eq!(comma(b","),   IResult::Done(EMPTY, Node::GetCh));
         assert_eq!(comma(b"a"),   IResult::Incomplete(Needed::Size(2)));
         assert_eq!(comma(b"a,b"), IResult::Done(EMPTY, Node::GetCh));
+    }
+
+    #[test]
+    fn test_parse_loop() {
+        let nodes1 = vec![Node::RShift, Node::Inc, Node::LShift, Node::PutCh];
+        let nodes2 = vec![Node::RShift, Node::Inc, Node::LShift, Node::PutCh];
+        assert_eq!(parse_loop(b"[>+<.]"),            IResult::Done(EMPTY, Node::Loop(From::from(nodes1))));
+        assert_eq!(parse_loop(b"a"),                 IResult::Incomplete(Needed::Size(2)));
+        assert_eq!(parse_loop(b"a[ b>  +e<//.'r]@"), IResult::Done(EMPTY, Node::Loop(From::from(nodes2))));
+    }
+
+    #[test]
+    fn test_parse_nested_loop() {
+        let iinodes = vec![Node::Inc, Node::LShift];
+        let inodes  = vec![Node::RShift, Node::Loop(From::from(iinodes)), Node::Dec];
+        let nodes   = vec![Node::GetCh, Node::Loop(From::from(inodes)), Node::PutCh];
+        assert_eq!(parse_loop(b"[,[>[+<]-].]"), IResult::Done(EMPTY, Node::Loop(From::from(nodes))));
     }
 }
