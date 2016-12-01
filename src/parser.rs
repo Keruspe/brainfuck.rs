@@ -24,15 +24,14 @@ macro_rules! tag_bf (
     });
 );
 
-named!(pub lshift<Node>,      do_parse!(tag_bf!("<") >> (Node::LShift)));
-named!(pub rshift<Node>,      do_parse!(tag_bf!(">") >> (Node::RShift)));
-named!(pub plus<Node>,        do_parse!(tag_bf!("+") >> (Node::Inc)));
-named!(pub minus<Node>,       do_parse!(tag_bf!("-") >> (Node::Dec)));
-named!(pub dot<Node>,         do_parse!(tag_bf!(".") >> (Node::PutCh)));
-named!(pub comma<Node>,       do_parse!(tag_bf!(",") >> (Node::GetCh)));
-named!(lbracket<Node>,    do_parse!(tag_bf!("[") >> node: map!(parse_loop, |block| Node::Loop(block)) >> (node)));
-named!(node<Node>,        do_parse!(node: alt!(lshift | rshift | plus | minus | dot | comma | lbracket) >> (node)));
-named!(parse_loop<Block>, do_parse!(block: map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| From::from(nodes)) >> (block)));
+named!(pub lshift<Node>,     do_parse!(tag_bf!("<") >> (Node::LShift)));
+named!(pub rshift<Node>,     do_parse!(tag_bf!(">") >> (Node::RShift)));
+named!(pub plus<Node>,       do_parse!(tag_bf!("+") >> (Node::Inc)));
+named!(pub minus<Node>,      do_parse!(tag_bf!("-") >> (Node::Dec)));
+named!(pub dot<Node>,        do_parse!(tag_bf!(".") >> (Node::PutCh)));
+named!(pub comma<Node>,      do_parse!(tag_bf!(",") >> (Node::GetCh)));
+named!(parse_loop<Node>, do_parse!(tag_bf!("[") >> block: map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| From::from(nodes)) >> (Node::Loop(block))));
+named!(node<Node>,       do_parse!(node: alt!(lshift | rshift | plus | minus | dot | comma | parse_loop) >> (node)));
 
 pub fn parse(i: &[u8]) -> Result<Block, ErrorKind<u32>> {
     map!(i, many0!(node), From::from).to_result()
