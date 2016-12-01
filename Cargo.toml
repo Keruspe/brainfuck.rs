@@ -1,7 +1,12 @@
 [package]
-name = "brainfuck"
-version = "0.1.0"
-authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
+name        = "brainfuck"
+version     = "0.1.0"
+authors     = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
+description = "brainfuck parser using nom"
+repository  = "https://github.com/Keruspe/brainfuck.rs"
+readme      = "README.md"
+keywords    = ["brainfuck","parser","nom"]
+license     = "MIT"
 
 [lib]
 name = "brainfuck"
