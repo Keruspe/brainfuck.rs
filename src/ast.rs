@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum Token {
     LShift,
     RShift,
@@ -25,6 +26,7 @@ impl Token {
     }
 }
 
+#[derive(Debug)]
 pub enum Node {
     LShift,
     RShift,
