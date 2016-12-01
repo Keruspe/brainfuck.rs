@@ -3,5 +3,8 @@ name = "brainfuck"
 version = "0.1.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 
+[lib]
+name = "brainfuck"
+
 [dependencies]
 nom = "^2.0.0"
