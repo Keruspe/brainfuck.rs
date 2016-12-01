@@ -1,17 +1,17 @@
 use nom::IResult;
 
 pub fn skip_unknown(i: &[u8]) -> IResult<&[u8], &[u8]> {
-    if i.length() == 0 {
-        IResult::Done::<&[u8], &[u8]>(i, i.slice(0..0))
+    if i.len() == 0 {
+        IResult::Done::<&[u8], &[u8]>(i, &i[0..0])
     } else {
-        match i.iter_indices().position(|(_, item)| {
+        match i.iter().enumerate().position(|(_, item)| {
             match *item as char {
                 '>'|'<'|'+'|'-'|'.'|','|'['|']' => true,
                 _                               => false,
             }
         }) {
-            Some(index) => IResult::Done(i.slice(index..), i.slice(..index)),
-            None        => IResult::Done(i.slice(i.input_len()..), i),
+            Some(index) => IResult::Done(&i[index..], &i[..index]),
+            None        => IResult::Done(&i[i.len()..], i),
         }
     }
 }
@@ -36,6 +36,6 @@ mod tests {
         let expected: Vec<&[u8]>            = vec![b"+", b"-", b"[", b"]", b">", b"<"];
         let got: IResult<&[u8], Vec<&[u8]>> = many1!(all, strip_unknown!(take!(1)));
 
-        assert_eq!(foo, IResult::Done(EMPTY, expected));
+        assert_eq!(got, IResult::Done(EMPTY, expected));
     }
 }
