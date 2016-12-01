@@ -19,3 +19,5 @@ fn main() {
     ctx.run(&block);
 }
 ```
+
+You can run `cargo run --example hello_world` to try this
