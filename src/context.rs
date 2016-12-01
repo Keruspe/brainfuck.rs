@@ -22,7 +22,6 @@ impl Context {
     pub fn run(&mut self, node: &Node) {
         match *node {
             Node::LShift => {
-                assert!(self.index > 0);
                 self.index -= 1;
             },
             Node::RShift => {
