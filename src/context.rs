@@ -3,15 +3,15 @@ use ast::Node;
 use std::io::{self, Read};
 
 pub struct Context {
-    buf:      Vec<i16>,
-    index:    usize,
+    buf:   Vec<i8>,
+    index: usize,
 }
 
 impl Context {
     pub fn new() -> Context {
         Context {
-            buf:      Vec::new(),
-            index:    0,
+            buf:   vec![0],
+            index: 0,
         }
     }
 
