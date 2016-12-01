@@ -31,7 +31,7 @@ named!(pub minus<Node>,      do_parse!(tag_bf!("-") >> (Node::Dec)));
 named!(pub dot<Node>,        do_parse!(tag_bf!(".") >> (Node::PutCh)));
 named!(pub comma<Node>,      do_parse!(tag_bf!(",") >> (Node::GetCh)));
 named!(pub parse_loop<Node>, preceded!(tag_bf!("["), map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| Node::Loop(From::from(nodes)))));
-named!(node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
+named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
 pub fn parse(i: &[u8]) -> Result<Block, ErrorKind<u32>> {
     map!(i, many0!(node), From::from).to_result()
@@ -103,5 +103,18 @@ mod tests {
         let inodes  = vec![Node::RShift, Node::Loop(From::from(iinodes)), Node::Dec];
         let nodes   = vec![Node::GetCh, Node::Loop(From::from(inodes)), Node::PutCh];
         assert_eq!(parse_loop(b"[,[>[+<]-].]"), IResult::Done(EMPTY, Node::Loop(From::from(nodes))));
+    }
+
+    #[test]
+    fn test_node() {
+        let nodes = vec![Node::RShift, Node::Inc, Node::LShift, Node::PutCh];
+        assert_eq!(node(b"<"),      IResult::Done(EMPTY, Node::LShift));
+        assert_eq!(node(b">"),      IResult::Done(EMPTY, Node::RShift));
+        assert_eq!(node(b"+"),      IResult::Done(EMPTY, Node::Inc));
+        assert_eq!(node(b"-"),      IResult::Done(EMPTY, Node::Dec));
+        assert_eq!(node(b"."),      IResult::Done(EMPTY, Node::PutCh));
+        assert_eq!(node(b","),      IResult::Done(EMPTY, Node::GetCh));
+        assert_eq!(node(b"[>+<.]"), IResult::Done(EMPTY, Node::Loop(From::from(nodes))));
+        assert_eq!(node(b"a"),      IResult::Incomplete(Needed::Size(2)));
     }
 }
