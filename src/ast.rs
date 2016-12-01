@@ -3,7 +3,7 @@ extern crate core;
 use std::convert::From;
 use std::iter::IntoIterator;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Node {
     LShift,
     RShift,
@@ -14,7 +14,7 @@ pub enum Node {
     Loop(Block),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Block(Vec<Node>);
 
 impl Block {
