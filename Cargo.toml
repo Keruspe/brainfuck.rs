@@ -1,5 +1,5 @@
 [package]
-name        = "brainfuck"
+name        = "brainfuck_rs"
 version     = "0.1.0"
 authors     = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description = "brainfuck parser using nom"
