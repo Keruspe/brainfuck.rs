@@ -1,3 +1,12 @@
+# brainfuck
+
+[![Build Status](https://travis-ci.org/Keruspe/brainfuck.rs.svg?branch=master)](https://travis-ci.org/Keruspe/brainfuck.rs)
+
+Implementation of a brainfuck parser written in rust using nom
+
+Example:
+
+```rust
 extern crate brainfuck;
 
 use brainfuck::context::Context;
@@ -9,3 +18,4 @@ fn main() {
     let nodes       = parser::parse(hello_world).expect("Failed parsing input file");
     ctx.run(&nodes);
 }
+```
