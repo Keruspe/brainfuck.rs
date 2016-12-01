@@ -28,8 +28,8 @@ pub fn next_token(i: &[u8]) -> IResult<&[u8], Option<Token>> {
     map!(i, strip_unknown!(take!(1)), |ch: &[u8]| Token::from_char(ch[0] as char))
 }
 
-pub fn parse_loop(mut i: &[u8]) -> IResult<&[u8], Vec<Node>> {
-    let mut nodes = Vec::new();
+pub fn parse_loop(mut i: &[u8]) -> IResult<&[u8], Block> {
+    let mut block = Block::new();
     loop {
         let tk = next_token(i);
         match tk {
@@ -39,12 +39,12 @@ pub fn parse_loop(mut i: &[u8]) -> IResult<&[u8], Vec<Node>> {
                 i = _i;
                 if let Some(token) = _o {
                     match token {
-                        Token::LShift   => nodes.push(Node::LShift),
-                        Token::RShift   => nodes.push(Node::RShift),
-                        Token::Plus     => nodes.push(Node::Inc),
-                        Token::Minus    => nodes.push(Node::Dec),
-                        Token::Dot      => nodes.push(Node::PutCh),
-                        Token::Comma    => nodes.push(Node::GetCh),
+                        Token::LShift   => block.push(Node::LShift),
+                        Token::RShift   => block.push(Node::RShift),
+                        Token::Plus     => block.push(Node::Inc),
+                        Token::Minus    => block.push(Node::Dec),
+                        Token::Dot      => block.push(Node::PutCh),
+                        Token::Comma    => block.push(Node::GetCh),
                         Token::LBracket => {
                             let lp = parse_loop(i);
                             match lp {
@@ -52,11 +52,11 @@ pub fn parse_loop(mut i: &[u8]) -> IResult<&[u8], Vec<Node>> {
                                 IResult::Incomplete(i) => return IResult::Incomplete(i),
                                 IResult::Done(_i, _o)  => {
                                     i = _i;
-                                    nodes.push(Node::Loop(_o));
+                                    block.push(Node::Loop(_o));
                                 }
                             }
                         },
-                        Token::RBracket => return IResult::Done(i, nodes),
+                        Token::RBracket => return IResult::Done(i, block),
                     }
                 } else {
                     return IResult::Error(error_code!(ErrorKind::Custom(42)))
@@ -80,7 +80,7 @@ pub fn parse_node(i: &[u8]) -> IResult<&[u8], Node> {
                     Token::Minus    => IResult::Done(i, Node::Dec),
                     Token::Dot      => IResult::Done(i, Node::PutCh),
                     Token::Comma    => IResult::Done(i, Node::GetCh),
-                    Token::LBracket => map!(i, parse_loop, |nodes| Node::Loop(nodes)),
+                    Token::LBracket => map!(i, parse_loop, |block| Node::Loop(block)),
                     Token::RBracket => IResult::Error(error_code!(ErrorKind::Custom(42))),
                 }
             } else {
@@ -90,8 +90,8 @@ pub fn parse_node(i: &[u8]) -> IResult<&[u8], Node> {
     }
 }
 
-pub fn parse(i: &[u8]) -> Result<Vec<Node>, ErrorKind<u32>> {
-    many0!(i, parse_node).to_result()
+pub fn parse(i: &[u8]) -> Result<Block, ErrorKind<u32>> {
+    map!(i, many0!(parse_node), From::from).to_result()
 }
 
 #[cfg(test)]

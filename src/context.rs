@@ -1,4 +1,4 @@
-use ast::Node;
+use ast::{Block, Node};
 
 use std::io::{self, Read};
 
@@ -60,18 +60,16 @@ impl Context {
                     *elem = buffer[0] as i8;
                 }
             },
-            Node::Loop(ref nodes) => {
+            Node::Loop(ref block) => {
                 while self.loop_cond() {
-                    for node in nodes {
-                        self.run_node(node);
-                    }
+                    self.run(block);
                 }
             },
         }
     }
 
-    pub fn run(&mut self, nodes: &Vec<Node>) {
-        for node in nodes {
+    pub fn run(&mut self, block: &Block) {
+        for node in block.into_iter() {
             self.run_node(node);
         }
     }
