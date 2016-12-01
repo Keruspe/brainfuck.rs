@@ -15,8 +15,16 @@ impl Context {
         }
     }
 
+    fn get(&self) -> Option<&i8> {
+        self.buf.get(self.index)
+    }
+
+    fn get_mut(&mut self) -> Option<&mut i8> {
+        self.buf.get_mut(self.index)
+    }
+
     fn loop_cond(&self) -> bool {
-        self.buf.get(self.index).map(|e| *e != 0).unwrap_or(false)
+        self.get().map(|e| *e != 0).unwrap_or(false)
     }
 
     pub fn run(&mut self, node: &Node) {
@@ -31,25 +39,25 @@ impl Context {
                 }
             },
             Node::Inc => {
-                if let Some(elem) = self.buf.get_mut(self.index) {
+                if let Some(elem) = self.get_mut() {
                     *elem += 1;
                 }
             },
             Node::Dec => {
-                if let Some(elem) = self.buf.get_mut(self.index) {
+                if let Some(elem) = self.get_mut() {
                     *elem -= 1;
                 }
             },
             Node::PutCh => {
-                if let Some(elem) = self.buf.get_mut(self.index) {
+                if let Some(elem) = self.get_mut() {
                     print!("{}", (*elem as u8) as char);
                 }
             },
             Node::GetCh => {
                 let mut buffer = [0;1];
                 io::stdin().read_exact(&mut buffer).expect("Failed to read from stdin");
-                if let Some(elem) = self.buf.get_mut(self.index) {
-                    *elem = buffer[0] as i16;
+                if let Some(elem) = self.get_mut() {
+                    *elem = buffer[0] as i8;
                 }
             },
             Node::Loop(ref nodes) => {
