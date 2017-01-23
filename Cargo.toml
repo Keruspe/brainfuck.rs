@@ -13,7 +13,8 @@ license       = "MIT"
 name = "brainfuck"
 
 [dependencies]
-nom = "^2.0.1"
+clap = "^2.20.0"
+nom  = "^2.0.1"
 
 [badges]
 travis-ci = { repository = "Keruspe/brainfuck.rs" }
