@@ -13,4 +13,4 @@ license       = "MIT"
 name = "brainfuck"
 
 [dependencies]
-nom = "^2.0.0"
+nom = "^2.0.1"
