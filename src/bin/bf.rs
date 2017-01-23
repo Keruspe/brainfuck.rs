@@ -22,6 +22,7 @@ fn main() {
 
     if let Err(err) = run(input) {
         println!("Error while running {}: {}", input, err);
+        std::process::exit(1);
     }
 }
 
