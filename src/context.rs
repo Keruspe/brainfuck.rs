@@ -3,24 +3,34 @@ use ast::{Block, Node};
 use std::io::{self, Read};
 
 pub struct Context {
-    buf:   Vec<i8>,
-    index: usize,
+    lbuf:  Vec<i8>,
+    rbuf:  Vec<i8>,
+    index: i64,
 }
 
 impl Context {
     pub fn new() -> Context {
         Context {
-            buf:   vec![0],
+            lbuf:  vec![0],
+            rbuf:  vec![0],
             index: 0,
         }
     }
 
     fn get(&self) -> Option<&i8> {
-        self.buf.get(self.index)
+        if self.index < 0 {
+            self.lbuf.get((-self.index - 1) as usize)
+        } else {
+            self.rbuf.get(self.index as usize)
+        }
     }
 
     fn get_mut(&mut self) -> Option<&mut i8> {
-        self.buf.get_mut(self.index)
+        if self.index < 0 {
+            self.lbuf.get_mut((-self.index - 1) as usize)
+        } else {
+            self.rbuf.get_mut(self.index as usize)
+        }
     }
 
     fn loop_cond(&self) -> bool {
@@ -31,11 +41,18 @@ impl Context {
         match *node {
             Node::LShift => {
                 self.index -= 1;
+                if self.index < 0 {
+                    while self.lbuf.len() <= ((-self.index - 1) as usize) {
+                        self.lbuf.push(0);
+                    }
+                }
             },
             Node::RShift => {
                 self.index += 1;
-                while self.buf.len() <= self.index {
-                    self.buf.push(0);
+                if self.index >= 0 {
+                    while self.rbuf.len() <= (self.index as usize) {
+                        self.rbuf.push(0);
+                    }
                 }
             },
             Node::Inc => {
