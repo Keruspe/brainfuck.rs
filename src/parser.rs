@@ -34,7 +34,7 @@ named!(pub parse_loop<Node>, preceded!(tag_bf!("["), map!(many_till!(call!(node)
 named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
 pub fn parse(i: &[u8]) -> Result<Block, ErrorKind<u32>> {
-    map!(i, many0!(node), From::from).to_result()
+    map!(i, many0!(complete!(node)), From::from).to_result()
 }
 
 #[cfg(test)]
