@@ -151,4 +151,14 @@ mod tests {
         ctx.run_node(&Node::Loop(From::from(vec![Node::Dec, Node::RShift, Node::Inc, Node::LShift])));
         assert_eq!(ctx, Context::new_with_data(Vec::new(), vec![0, 2], 0));
     }
+
+    #[test]
+    fn test_left_loop() {
+        let mut ctx = Context::new();
+        ctx.run_node(&Node::LShift);
+        ctx.run_node(&Node::Inc);
+        ctx.run_node(&Node::Inc);
+        ctx.run_node(&Node::Loop(From::from(vec![Node::Dec, Node::LShift, Node::Inc, Node::RShift])));
+        assert_eq!(ctx, Context::new_with_data(vec![0, 2], vec![0], -1));
+    }
 }
