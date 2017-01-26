@@ -2,6 +2,7 @@ use ast::{Block, Node};
 
 use std::io::{self, Read};
 
+#[derive(Debug, PartialEq)]
 pub struct Context {
     lbuf:  Vec<i8>,
     rbuf:  Vec<i8>,
@@ -14,6 +15,15 @@ impl Context {
             lbuf:  vec![0],
             rbuf:  vec![0],
             index: 0,
+        }
+    }
+
+    #[cfg(test)]
+    pub fn new_with_data(lbuf: Vec<i8>, rbuf: Vec<i8>, index: i64) -> Context {
+        Context {
+            lbuf:  lbuf,
+            rbuf:  rbuf,
+            index: index,
         }
     }
 
@@ -89,5 +99,56 @@ impl Context {
         for node in block.into_iter() {
             self.run_node(node);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use ast::Node;
+
+    #[test]
+    fn test_lshift() {
+        let mut ctx = Context::new();
+        ctx.run_node(&Node::LShift);
+        assert_eq!(ctx, Context::new_with_data(vec![0], vec![0], -1));
+    }
+
+    #[test]
+    fn test_rshift() {
+        let mut ctx = Context::new();
+        ctx.run_node(&Node::RShift);
+        assert_eq!(ctx, Context::new_with_data(vec![0], vec![0, 0], 1));
+    }
+
+    #[test]
+    fn test_inc() {
+        let mut ctx = Context::new();
+        ctx.run_node(&Node::Inc);
+        assert_eq!(ctx, Context::new_with_data(vec![0], vec![1], 0));
+    }
+
+    #[test]
+    fn test_dec() {
+        let mut ctx = Context::new();
+        ctx.run_node(&Node::Dec);
+        assert_eq!(ctx, Context::new_with_data(vec![0], vec![-1], 0));
+    }
+
+    #[test]
+    fn test_block() {
+        let mut ctx = Context::new();
+        ctx.run(&From::from(vec![Node::Inc, Node::RShift, Node::Inc, Node::LShift, Node::LShift, Node::LShift, Node::Dec]));
+        assert_eq!(ctx, Context::new_with_data(vec![0, -1], vec![1, 1], -2));
+    }
+
+    #[test]
+    fn test_loop() {
+        let mut ctx = Context::new();
+        ctx.run_node(&Node::Inc);
+        ctx.run_node(&Node::Inc);
+        ctx.run_node(&Node::Loop(From::from(vec![Node::Dec, Node::RShift, Node::Inc, Node::LShift])));
+        assert_eq!(ctx, Context::new_with_data(vec![0], vec![0, 2], 0));
     }
 }
