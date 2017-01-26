@@ -34,7 +34,11 @@ named!(pub parse_loop<Node>, preceded!(tag_bf!("["), map!(many_till!(call!(node)
 named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
 pub fn parse(i: &[u8]) -> Result<Block, ErrorKind<u32>> {
-    map!(i, many0!(complete!(node)), From::from).to_result()
+    do_parse!(i,
+        res: map!(many0!(complete!(node)), From::from) >>
+             eof!()                                    >>
+        (res)
+    ).to_result()
 }
 
 #[cfg(test)]
@@ -124,6 +128,6 @@ mod tests {
         block.push(Node::Loop(From::from(vec![Node::LShift, Node::RShift])));
         block.push(Node::PutCh);
         assert_eq!(parse(b"abc[<>]."), Ok(block));
-        assert_eq!(parse(b""),         Ok(Block::new()));
+        assert_eq!(parse(EMPTY),       Ok(Block::new()));
     }
 }
