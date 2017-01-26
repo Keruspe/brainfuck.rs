@@ -12,7 +12,7 @@ pub struct Context {
 impl Context {
     pub fn new() -> Context {
         Context {
-            lbuf:  vec![0],
+            lbuf:  Vec::new(),
             rbuf:  vec![0],
             index: 0,
         }
@@ -119,21 +119,21 @@ mod tests {
     fn test_rshift() {
         let mut ctx = Context::new();
         ctx.run_node(&Node::RShift);
-        assert_eq!(ctx, Context::new_with_data(vec![0], vec![0, 0], 1));
+        assert_eq!(ctx, Context::new_with_data(Vec::new(), vec![0, 0], 1));
     }
 
     #[test]
     fn test_inc() {
         let mut ctx = Context::new();
         ctx.run_node(&Node::Inc);
-        assert_eq!(ctx, Context::new_with_data(vec![0], vec![1], 0));
+        assert_eq!(ctx, Context::new_with_data(Vec::new(), vec![1], 0));
     }
 
     #[test]
     fn test_dec() {
         let mut ctx = Context::new();
         ctx.run_node(&Node::Dec);
-        assert_eq!(ctx, Context::new_with_data(vec![0], vec![-1], 0));
+        assert_eq!(ctx, Context::new_with_data(Vec::new(), vec![-1], 0));
     }
 
     #[test]
@@ -149,6 +149,6 @@ mod tests {
         ctx.run_node(&Node::Inc);
         ctx.run_node(&Node::Inc);
         ctx.run_node(&Node::Loop(From::from(vec![Node::Dec, Node::RShift, Node::Inc, Node::LShift])));
-        assert_eq!(ctx, Context::new_with_data(vec![0], vec![0, 2], 0));
+        assert_eq!(ctx, Context::new_with_data(Vec::new(), vec![0, 2], 0));
     }
 }
