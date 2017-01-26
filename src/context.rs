@@ -137,6 +137,13 @@ mod tests {
     }
 
     #[test]
+    fn test_putch() {
+        let mut ctx = Context::new();
+        ctx.run_node(&Node::PutCh);
+        assert_eq!(ctx, Context::new());
+    }
+
+    #[test]
     fn test_block() {
         let mut ctx = Context::new();
         ctx.run(&From::from(vec![Node::Inc, Node::RShift, Node::Inc, Node::LShift, Node::LShift, Node::LShift, Node::Dec]));
