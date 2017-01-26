@@ -41,7 +41,7 @@ pub fn parse(i: &[u8]) -> Result<Block, ErrorKind<u32>> {
 mod tests {
     use super::*;
 
-    use ast::Node;
+    use ast::{Block, Node};
     use nom::{IResult, Needed};
 
     const EMPTY: &'static [u8] = b"";
@@ -116,5 +116,14 @@ mod tests {
         assert_eq!(node(b","),      IResult::Done(EMPTY, Node::GetCh));
         assert_eq!(node(b"[>+<.]"), IResult::Done(EMPTY, Node::Loop(From::from(nodes))));
         assert_eq!(node(b"a"),      IResult::Incomplete(Needed::Size(2)));
+    }
+
+    #[test]
+    fn test_parse() {
+        let mut block = Block::new();
+        block.push(Node::Loop(From::from(vec![Node::LShift, Node::RShift])));
+        block.push(Node::PutCh);
+        assert_eq!(parse(b"abc[<>]."), Ok(block));
+        assert_eq!(parse(b""),         Ok(Block::new()));
     }
 }
