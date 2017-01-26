@@ -11,7 +11,7 @@ before_script:
     - export PATH=$HOME/.cargo/bin:$PATH
 
 after_success:
-    - cargo coveralls
+    - cargo coveralls --lib
 
 addons:
     apt:
