@@ -14,7 +14,7 @@ name = "brainfuck"
 
 [dependencies]
 clap = "^2.20.0"
-nom  = "^2.0.1"
+nom  = "^2.1.0"
 
 [badges]
 travis-ci = { repository = "Keruspe/brainfuck.rs" }
