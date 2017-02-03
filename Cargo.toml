@@ -1,19 +1,20 @@
 [package]
 name          = "brainfuck_rs"
-version       = "0.3.1"
+version       = "1.0.0"
 authors       = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description   = "brainfuck parser using nom"
 repository    = "https://github.com/Keruspe/brainfuck.rs"
 documentation = "https://docs.rs/brainfuck_rs/" 
 readme        = "README.md"
 keywords      = ["brainfuck","parser","interpreter","nom"]
+categories    = ["command-line-utilities","parser-implementations"]
 license       = "MIT"
 
 [lib]
 name = "brainfuck"
 
 [dependencies]
-clap = "^2.20.1"
+clap = "^2.20.3"
 nom  = "^2.1.0"
 
 [badges]
