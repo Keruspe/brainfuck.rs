@@ -13,7 +13,7 @@ license       = "MIT"
 name = "brainfuck"
 
 [dependencies]
-clap = "^2.20.0"
+clap = "^2.20.1"
 nom  = "^2.1.0"
 
 [badges]
