@@ -3,9 +3,15 @@
 [![Build Status](https://travis-ci.org/Keruspe/brainfuck.rs.svg?branch=master)](https://travis-ci.org/Keruspe/brainfuck.rs)
 [![Coverage Status](https://coveralls.io/repos/github/Keruspe/brainfuck.rs/badge.svg?branch=master)](https://coveralls.io/github/Keruspe/brainfuck.rs?branch=master)
 
-Implementation of a brainfuck parser written in rust using nom
+Implementation of a brainfuck parser and interpreter written in rust using nom
 
-Example:
+## Interpreter example
+
+```
+cargo run --bin bf examples/bottles.bf
+```
+
+## Parser example
 
 ```rust
 extern crate brainfuck;
