@@ -1,19 +1,14 @@
 use ast::{Block, Node};
 use nom::{IResult, ErrorKind};
 
-fn skip_unknown_bf(i: &[u8]) -> IResult<&[u8], &[u8]> {
-    if i.len() == 0 {
-        IResult::Done::<&[u8], &[u8]>(i, &i[0..0])
+const ALLOWED: &'static str = "<>+-.,[]";
+
+pub fn skip_unknown_bf(i: &[u8]) -> IResult<&[u8], &[u8]> {
+    let res = complete!(i, is_not!(ALLOWED));
+    if res.is_done() {
+        res
     } else {
-        match i.iter().enumerate().position(|(_, item)| {
-            match *item as char {
-                '>'|'<'|'+'|'-'|'.'|','|'['|']' => true,
-                _                               => false,
-            }
-        }) {
-            Some(index) => IResult::Done(&i[index..], &i[..index]),
-            None        => IResult::Done(&i[i.len()..], i),
-        }
+        IResult::Done(i, &i[0..0])
     }
 }
 
