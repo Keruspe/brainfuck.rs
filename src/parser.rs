@@ -4,12 +4,7 @@ use nom::{IResult, ErrorKind};
 const ALLOWED: &'static str = "<>+-.,[]";
 
 pub fn skip_unknown_bf(i: &[u8]) -> IResult<&[u8], &[u8]> {
-    let res = complete!(i, is_not!(ALLOWED));
-    if res.is_done() {
-        res
-    } else {
-        IResult::Done(i, &i[0..0])
-    }
+    is_not!(i, ALLOWED).or(IResult::Done(i, &i[0..0]))
 }
 
 macro_rules! tag_bf (
