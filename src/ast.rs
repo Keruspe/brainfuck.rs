@@ -27,6 +27,12 @@ impl Block {
     }
 }
 
+impl Default for Block {
+    fn default() -> Self {
+        Block::new()
+    }
+}
+
 impl From<Vec<Node>> for Block {
     fn from(nodes: Vec<Node>) -> Self {
         Block(nodes)

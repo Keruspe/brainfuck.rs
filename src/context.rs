@@ -102,6 +102,12 @@ impl Context {
     }
 }
 
+impl Default for Context {
+    fn default() -> Self {
+        Context::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -146,6 +152,7 @@ mod tests {
     #[test]
     fn test_block() {
         let mut ctx = Context::new();
+        ctx.run(&Block::default());
         ctx.run(&From::from(vec![Node::Inc, Node::RShift, Node::Inc, Node::LShift, Node::LShift, Node::LShift, Node::Dec]));
         assert_eq!(ctx, Context::new_with_data(vec![0, -1], vec![1, 1], -2));
     }
@@ -161,7 +168,7 @@ mod tests {
 
     #[test]
     fn test_left_loop() {
-        let mut ctx = Context::new();
+        let mut ctx = Context::default();
         ctx.run_node(&Node::LShift);
         ctx.run_node(&Node::Inc);
         ctx.run_node(&Node::Inc);
