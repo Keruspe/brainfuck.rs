@@ -93,9 +93,9 @@ mod tests {
 
     #[test]
     fn test_parse_nested_loop() {
-        let iinodes = vec![Node::Inc, Node::LShift];
+        let iinodes = vec![Node::Inc,    Node::LShift];
         let inodes  = vec![Node::RShift, Node::Loop(From::from(iinodes)), Node::Dec];
-        let nodes   = vec![Node::GetCh, Node::Loop(From::from(inodes)), Node::PutCh];
+        let nodes   = vec![Node::GetCh,  Node::Loop(From::from(inodes)),  Node::PutCh];
         assert_eq!(parse_loop(b"[,[>[+<]-].]"), IResult::Done(EMPTY, Node::Loop(From::from(nodes))));
     }
 

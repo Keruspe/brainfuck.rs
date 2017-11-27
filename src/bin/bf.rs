@@ -2,9 +2,9 @@ extern crate brainfuck;
 extern crate clap;
 
 use brainfuck::context::Context;
+use brainfuck::error::Result;
 use brainfuck::parser;
 use clap::{App, Arg};
-use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 
@@ -26,7 +26,7 @@ fn main() {
     }
 }
 
-fn run(input: &str) -> Result<(), Box<Error>> {
+fn run(input: &str) -> Result<()> {
     let mut contents = vec![];
 
     File::open(input)?.read_to_end(&mut contents)?;
