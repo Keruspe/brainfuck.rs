@@ -39,8 +39,8 @@ impl From<io::Error> for Error {
     }
 }
 
-impl<'a> From<nom::Err<&'a [u8], u32>> for Error {
-    fn from(err: nom::Err<&[u8], u32>) -> Error {
+impl<T: fmt::Debug> From<nom::Err<T, u32>> for Error {
+    fn from(err: nom::Err<T, u32>) -> Error {
         Error::ParseError(format!("{:?}", err))
     }
 }

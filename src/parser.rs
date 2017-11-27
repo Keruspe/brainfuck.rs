@@ -1,10 +1,14 @@
 use ast::{Block, Node};
 use nom;
 
+use std::ops;
+
 const ALLOWED: &'static str = "<>+-.,[]";
 
-pub fn skip_unknown_bf(i: &[u8]) -> Result<(&[u8], &[u8]), nom::Err<&[u8], u32>> {
-    is_not!(i, ALLOWED).or(Ok((i, &i[0..0])))
+pub fn skip_unknown_bf<T>(i: T) -> nom::IResult<T, T, u32>
+    where T:            nom::InputIter+nom::InputLength+nom::Slice<ops::RangeFrom<usize>>+nom::Slice<ops::RangeTo<usize>>+nom::Slice<ops::Range<usize>>+Copy,
+          &'static str: nom::FindToken<<T as nom::InputIter>::RawItem> {
+    is_not!(i, ALLOWED).or(Ok((i, i.slice(0..0))))
 }
 
 macro_rules! tag_bf (
@@ -14,17 +18,27 @@ macro_rules! tag_bf (
     });
 );
 
-named!(pub lshift<Node>,     do_parse!(tag_bf!("<") >> (Node::LShift)));
-named!(pub rshift<Node>,     do_parse!(tag_bf!(">") >> (Node::RShift)));
-named!(pub plus<Node>,       do_parse!(tag_bf!("+") >> (Node::Inc)));
-named!(pub minus<Node>,      do_parse!(tag_bf!("-") >> (Node::Dec)));
-named!(pub dot<Node>,        do_parse!(tag_bf!(".") >> (Node::PutCh)));
-named!(pub comma<Node>,      do_parse!(tag_bf!(",") >> (Node::GetCh)));
-named!(pub parse_loop<Node>, preceded!(tag_bf!("["), map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| Node::Loop(From::from(nodes)))));
-named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
+macro_rules! bf_named {
+    (pub $name:ident<$o:ty>, $submac:ident!( $($args:tt)* )) => (
+        fn $name<T>( i: T ) -> nom::IResult<T, $o, u32>
+            where T:            nom::InputIter+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+nom::Slice<ops::RangeFrom<usize>>+nom::Slice<ops::RangeTo<usize>>+nom::Slice<ops::Range<usize>>+Clone+Copy+PartialEq,
+                  &'static str: nom::FindToken<<T as nom::InputIter>::RawItem> {
+            $submac!(i, $($args)*)
+        }
+    );
+}
 
-pub fn parse(i: &[u8]) -> Result<Block, nom::Err<&[u8], u32>> {
-    do_parse!(i,
+bf_named!(pub lshift<Node>,     do_parse!(tag_bf!("<") >> (Node::LShift)));
+bf_named!(pub rshift<Node>,     do_parse!(tag_bf!(">") >> (Node::RShift)));
+bf_named!(pub plus<Node>,       do_parse!(tag_bf!("+") >> (Node::Inc)));
+bf_named!(pub minus<Node>,      do_parse!(tag_bf!("-") >> (Node::Dec)));
+bf_named!(pub dot<Node>,        do_parse!(tag_bf!(".") >> (Node::PutCh)));
+bf_named!(pub comma<Node>,      do_parse!(tag_bf!(",") >> (Node::GetCh)));
+bf_named!(pub parse_loop<Node>, preceded!(tag_bf!("["), map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| Node::Loop(From::from(nodes)))));
+bf_named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
+
+pub fn parse(i: &[u8]) -> Result<Block, nom::Err<nom::types::CompleteByteSlice, u32>> {
+    do_parse!(nom::types::CompleteByteSlice(i),
         res: map!(many0!(complete!(node)), From::from) >>
              eof!()                                    >>
         (res)
