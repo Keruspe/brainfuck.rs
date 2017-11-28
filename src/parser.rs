@@ -42,53 +42,53 @@ mod tests {
 
     #[test]
     fn test_lshift() {
-        assert_eq!(lshift(b"<"),   Ok((EMPTY, Node::LShift)));
-        assert_eq!(lshift(b"a"),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(lshift(b"a<b"), Ok((EMPTY, Node::LShift)));
+        assert_eq!(lshift(&b"<"[..]),   Ok((EMPTY, Node::LShift)));
+        assert_eq!(lshift(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
+        assert_eq!(lshift(&b"a<b"[..]), Ok((EMPTY, Node::LShift)));
     }
 
     #[test]
     fn test_rshift() {
-        assert_eq!(rshift(b">"),   Ok((EMPTY, Node::RShift)));
-        assert_eq!(rshift(b"a"),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(rshift(b"a>b"), Ok((EMPTY, Node::RShift)));
+        assert_eq!(rshift(&b">"[..]),   Ok((EMPTY, Node::RShift)));
+        assert_eq!(rshift(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
+        assert_eq!(rshift(&b"a>b"[..]), Ok((EMPTY, Node::RShift)));
     }
 
     #[test]
     fn test_plus() {
-        assert_eq!(plus(b"+"),   Ok((EMPTY, Node::Inc)));
-        assert_eq!(plus(b"a"),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(plus(b"a+b"), Ok((EMPTY, Node::Inc)));
+        assert_eq!(plus(&b"+"[..]),   Ok((EMPTY, Node::Inc)));
+        assert_eq!(plus(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
+        assert_eq!(plus(&b"a+b"[..]), Ok((EMPTY, Node::Inc)));
     }
 
     #[test]
     fn test_minus() {
-        assert_eq!(minus(b"-"),   Ok((EMPTY, Node::Dec)));
-        assert_eq!(minus(b"a"),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(minus(b"a-b"), Ok((EMPTY, Node::Dec)));
+        assert_eq!(minus(&b"-"[..]),   Ok((EMPTY, Node::Dec)));
+        assert_eq!(minus(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
+        assert_eq!(minus(&b"a-b"[..]), Ok((EMPTY, Node::Dec)));
     }
 
     #[test]
     fn test_dot() {
-        assert_eq!(dot(b"."),   Ok((EMPTY, Node::PutCh)));
-        assert_eq!(dot(b"a"),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(dot(b"a.b"), Ok((EMPTY, Node::PutCh)));
+        assert_eq!(dot(&b"."[..]),   Ok((EMPTY, Node::PutCh)));
+        assert_eq!(dot(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
+        assert_eq!(dot(&b"a.b"[..]), Ok((EMPTY, Node::PutCh)));
     }
 
     #[test]
     fn test_comma() {
-        assert_eq!(comma(b","),   Ok((EMPTY, Node::GetCh)));
-        assert_eq!(comma(b"a"),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(comma(b"a,b"), Ok((EMPTY, Node::GetCh)));
+        assert_eq!(comma(&b","[..]),   Ok((EMPTY, Node::GetCh)));
+        assert_eq!(comma(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
+        assert_eq!(comma(&b"a,b"[..]), Ok((EMPTY, Node::GetCh)));
     }
 
     #[test]
     fn test_parse_loop() {
         let nodes1 = vec![Node::RShift, Node::Inc, Node::LShift, Node::PutCh];
         let nodes2 = vec![Node::RShift, Node::Inc, Node::LShift, Node::PutCh];
-        assert_eq!(parse_loop(b"[>+<.]"),            Ok((EMPTY, Node::Loop(From::from(nodes1)))));
-        assert_eq!(parse_loop(b"a"),                 Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(parse_loop(b"a[ b>  +e<//.'r]@"), Ok((EMPTY, Node::Loop(From::from(nodes2)))));
+        assert_eq!(parse_loop(&b"[>+<.]"[..]),            Ok((EMPTY, Node::Loop(From::from(nodes1)))));
+        assert_eq!(parse_loop(&b"a"[..]),                 Err(nom::Err::Incomplete(Needed::Size(1))));
+        assert_eq!(parse_loop(&b"a[ b>  +e<//.'r]@"[..]), Ok((EMPTY, Node::Loop(From::from(nodes2)))));
     }
 
     #[test]
@@ -96,20 +96,20 @@ mod tests {
         let iinodes = vec![Node::Inc,    Node::LShift];
         let inodes  = vec![Node::RShift, Node::Loop(From::from(iinodes)), Node::Dec];
         let nodes   = vec![Node::GetCh,  Node::Loop(From::from(inodes)),  Node::PutCh];
-        assert_eq!(parse_loop(b"[,[>[+<]-].]"), Ok((EMPTY, Node::Loop(From::from(nodes)))));
+        assert_eq!(parse_loop(&b"[,[>[+<]-].]"[..]), Ok((EMPTY, Node::Loop(From::from(nodes)))));
     }
 
     #[test]
     fn test_node() {
         let nodes = vec![Node::RShift, Node::Inc, Node::LShift, Node::PutCh];
-        assert_eq!(node(b"<"),      Ok((EMPTY, Node::LShift)));
-        assert_eq!(node(b">"),      Ok((EMPTY, Node::RShift)));
-        assert_eq!(node(b"+"),      Ok((EMPTY, Node::Inc)));
-        assert_eq!(node(b"-"),      Ok((EMPTY, Node::Dec)));
-        assert_eq!(node(b"."),      Ok((EMPTY, Node::PutCh)));
-        assert_eq!(node(b","),      Ok((EMPTY, Node::GetCh)));
-        assert_eq!(node(b"[>+<.]"), Ok((EMPTY, Node::Loop(From::from(nodes)))));
-        assert_eq!(node(b"a"),      Err(nom::Err::Incomplete(Needed::Size(1))));
+        assert_eq!(node(&b"<"[..]),      Ok((EMPTY, Node::LShift)));
+        assert_eq!(node(&b">"[..]),      Ok((EMPTY, Node::RShift)));
+        assert_eq!(node(&b"+"[..]),      Ok((EMPTY, Node::Inc)));
+        assert_eq!(node(&b"-"[..]),      Ok((EMPTY, Node::Dec)));
+        assert_eq!(node(&b"."[..]),      Ok((EMPTY, Node::PutCh)));
+        assert_eq!(node(&b","[..]),      Ok((EMPTY, Node::GetCh)));
+        assert_eq!(node(&b"[>+<.]"[..]), Ok((EMPTY, Node::Loop(From::from(nodes)))));
+        assert_eq!(node(&b"a"[..]),      Err(nom::Err::Incomplete(Needed::Size(1))));
     }
 
     #[test]
@@ -117,7 +117,7 @@ mod tests {
         let mut block = Block::new();
         block.push(Node::Loop(From::from(vec![Node::LShift, Node::RShift])));
         block.push(Node::PutCh);
-        assert_eq!(parse(b"abc[<>]."), Ok(block));
-        assert_eq!(parse(EMPTY),       Ok(Block::new()));
+        assert_eq!(parse(&b"abc[<>]."[..]), Ok(block));
+        assert_eq!(parse(EMPTY),            Ok(Block::new()));
     }
 }
