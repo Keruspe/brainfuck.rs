@@ -11,7 +11,7 @@ pub fn skip_unknown_bf<T>(i: T) -> nom::IResult<T, T, u32>
     is_not!(i, ALLOWED).or(Ok((i, i.slice(0..0))))
 }
 
-macro_rules! tag_bf (
+macro_rules! bf_tag (
     ($i: expr, $tag: expr) => ({
         use $crate::parser::skip_unknown_bf;
         sep!($i, skip_unknown_bf, tag!($tag))
@@ -28,13 +28,13 @@ macro_rules! bf_named {
     );
 }
 
-bf_named!(pub lshift<Node>,     do_parse!(tag_bf!("<") >> (Node::LShift)));
-bf_named!(pub rshift<Node>,     do_parse!(tag_bf!(">") >> (Node::RShift)));
-bf_named!(pub plus<Node>,       do_parse!(tag_bf!("+") >> (Node::Inc)));
-bf_named!(pub minus<Node>,      do_parse!(tag_bf!("-") >> (Node::Dec)));
-bf_named!(pub dot<Node>,        do_parse!(tag_bf!(".") >> (Node::PutCh)));
-bf_named!(pub comma<Node>,      do_parse!(tag_bf!(",") >> (Node::GetCh)));
-bf_named!(pub parse_loop<Node>, preceded!(tag_bf!("["), map!(many_till!(call!(node), tag_bf!("]")), |(nodes, _)| Node::Loop(From::from(nodes)))));
+bf_named!(pub lshift<Node>,     do_parse!(bf_tag!("<") >> (Node::LShift)));
+bf_named!(pub rshift<Node>,     do_parse!(bf_tag!(">") >> (Node::RShift)));
+bf_named!(pub plus<Node>,       do_parse!(bf_tag!("+") >> (Node::Inc)));
+bf_named!(pub minus<Node>,      do_parse!(bf_tag!("-") >> (Node::Dec)));
+bf_named!(pub dot<Node>,        do_parse!(bf_tag!(".") >> (Node::PutCh)));
+bf_named!(pub comma<Node>,      do_parse!(bf_tag!(",") >> (Node::GetCh)));
+bf_named!(pub parse_loop<Node>, preceded!(bf_tag!("["), map!(many_till!(call!(node), bf_tag!("]")), |(nodes, _)| Node::Loop(From::from(nodes)))));
 bf_named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
 pub fn parse(i: &[u8]) -> Result<Block, nom::Err<nom::types::CompleteByteSlice, u32>> {
