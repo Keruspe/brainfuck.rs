@@ -23,13 +23,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "brainfuck_rs"
 version = "1.1.1"
 dependencies = [
- "clap 2.28.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clap 2.29.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "nom 4.0.0-alpha1 (git+git://github.com/geal/nom)",
 ]
 
 [[package]]
 name = "clap"
-version = "2.28.0"
+version = "2.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "ansi_term 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -66,7 +66,7 @@ dependencies = [
 [[package]]
 name = "nom"
 version = "4.0.0-alpha1"
-source = "git+git://github.com/geal/nom#21c0f8cba5d01d3af0b702e1a146c6fbc9b05c2b"
+source = "git+git://github.com/geal/nom#a8af835f9330713a87353cc2536453a483f7b56b"
 dependencies = [
  "memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -131,7 +131,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum ansi_term 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)" = "6b3568b48b7cefa6b8ce125f9bb4989e52fbcc29ebea88df04cc7c5f12f70455"
 "checksum atty 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "21e50800ec991574876040fff8ee46b136a53e985286fbe6a3bdfe6421b78860"
 "checksum bitflags 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "b3c30d3802dfb7281680d6285f2ccdaa8c2d8fee41f93805dba5c4cf50dc23cf"
-"checksum clap 2.28.0 (registry+https://github.com/rust-lang/crates.io-index)" = "dc34bf7d5d66268b466b9852bca925ec1d2650654dab4da081e63fd230145c2e"
+"checksum clap 2.29.0 (registry+https://github.com/rust-lang/crates.io-index)" = "110d43e343eb29f4f51c1db31beb879d546db27998577e5715270a54bcf41d3f"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"
 "checksum libc 0.2.34 (registry+https://github.com/rust-lang/crates.io-index)" = "36fbc8a8929c632868295d0178dd8f63fc423fd7537ad0738372bd010b3ac9b0"
 "checksum memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "796fba70e76612589ed2ce7f45282f5af869e0fdd7cc6199fa1aa1f1d591ba9d"
