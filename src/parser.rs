@@ -1,3 +1,5 @@
+pub use nom::types::CompleteByteSlice;
+
 use ast::{Block, Node};
 use nom;
 
@@ -37,8 +39,10 @@ bf_named!(pub comma<Node>,      do_parse!(bf_tag!(",") >> (Node::GetCh)));
 bf_named!(pub parse_loop<Node>, preceded!(bf_tag!("["), map!(many_till!(call!(node), bf_tag!("]")), |(nodes, _)| Node::Loop(From::from(nodes)))));
 bf_named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
-pub fn parse(i: &[u8]) -> Result<Block, nom::Err<nom::types::CompleteByteSlice, u32>> {
-    do_parse!(nom::types::CompleteByteSlice(i),
+pub fn parse<T>(i: T) -> Result<Block, nom::Err<T, u32>>
+    where T:            nom::InputIter+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+nom::Slice<ops::RangeFrom<usize>>+nom::Slice<ops::RangeTo<usize>>+nom::Slice<ops::Range<usize>>+Clone+Copy+PartialEq,
+          &'static str: nom::FindToken<<T as nom::InputIter>::RawItem> {
+    do_parse!(i,
         res: map!(many0!(complete!(node)), From::from) >>
              eof!()                                    >>
         (res)
@@ -131,7 +135,7 @@ mod tests {
         let mut block = Block::new();
         block.push(Node::Loop(From::from(vec![Node::LShift, Node::RShift])));
         block.push(Node::PutCh);
-        assert_eq!(parse(&b"abc[<>]."[..]), Ok(block));
-        assert_eq!(parse(EMPTY),            Ok(Block::new()));
+        assert_eq!(parse(CompleteByteSlice(&b"abc[<>]."[..])), Ok(block));
+        assert_eq!(parse(CompleteByteSlice(EMPTY)),            Ok(Block::new()));
     }
 }

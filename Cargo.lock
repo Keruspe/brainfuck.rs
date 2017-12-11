@@ -66,7 +66,7 @@ dependencies = [
 [[package]]
 name = "nom"
 version = "4.0.0-alpha1"
-source = "git+git://github.com/geal/nom#a8af835f9330713a87353cc2536453a483f7b56b"
+source = "git+git://github.com/geal/nom#a53febdfdf99d16c0177f5c605bd98481a4ec50f"
 dependencies = [
  "memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

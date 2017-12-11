@@ -31,5 +31,5 @@ fn run(input: &str) -> Result<()> {
 
     File::open(input)?.read_to_end(&mut contents)?;
 
-    Ok(Context::new().run(&parser::parse(contents.as_ref())?))
+    Ok(Context::new().run(&parser::parse(parser::CompleteByteSlice(contents.as_ref()))?))
 }
