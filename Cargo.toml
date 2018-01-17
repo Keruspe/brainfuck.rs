@@ -15,9 +15,7 @@ name = "brainfuck"
 
 [dependencies]
 clap = "^2"
-#nom  = "^4.0.0-alpha1"
-[dependencies.nom]
-git = "git://github.com/geal/nom"
+nom  = "^4.0.0-alpha2"
 
 [badges]
 travis-ci = { repository = "Keruspe/brainfuck.rs" }
