@@ -34,7 +34,7 @@ macro_rules! bf_tag (
 macro_rules! bf_named {
     (pub $name:ident<$o:ty>, $submac:ident!( $($args:tt)* )) => (
         fn $name<T>( i: T ) -> nom::IResult<T, $o, u32>
-            where T:            nom::InputTake+nom::InputTakeAtPosition+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+Clone+Copy+PartialEq,
+            where T:            nom::InputTake+nom::InputTakeAtPosition+nom::AtEof+nom::Compare<&'static str>+Copy+PartialEq,
                   &'static str: nom::FindToken<<T as nom::InputTakeAtPosition>::Item> {
             $submac!(i, $($args)*)
         }
@@ -51,7 +51,7 @@ bf_named!(pub parse_loop<Node>, preceded!(bf_tag!("["), map!(many_till!(call!(no
 bf_named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
 pub fn parse<T>(i: T) -> Result<Block, nom::Err<T, u32>>
-    where T:            nom::InputTake+nom::InputTakeAtPosition+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+Clone+Copy+PartialEq,
+    where T:            nom::InputTake+nom::InputTakeAtPosition+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+Copy+PartialEq,
           &'static str: nom::FindToken<<T as nom::InputTakeAtPosition>::Item> {
     do_parse!(i,
         res: map!(many0!(complete!(node)), From::from) >>
