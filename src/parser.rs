@@ -5,7 +5,7 @@ use nom;
 
 const ALLOWED: &'static str = "<>+-.,[]";
 
-pub fn skip_unknown_bf<T>(i: T) -> nom::IResult<T, T, u32>
+pub fn bf_skip_unknown<T>(i: T) -> nom::IResult<T, T, u32>
     where T:            nom::InputTake+nom::InputTakeAtPosition+Copy,
           &'static str: nom::FindToken<<T as nom::InputTakeAtPosition>::Item> {
     is_not!(i, ALLOWED).or_else(|e| match e {
@@ -14,10 +14,20 @@ pub fn skip_unknown_bf<T>(i: T) -> nom::IResult<T, T, u32>
     })
 }
 
+pub fn bf_skip_unknown_no_incomplete<T>(i: T) -> nom::IResult<T, T, u32>
+    where T:            nom::InputTake+nom::InputTakeAtPosition+Copy,
+          &'static str: nom::FindToken<<T as nom::InputTakeAtPosition>::Item> {
+    bf_skip_unknown(i).or(Ok((i, i.take(0))))
+}
+
 macro_rules! bf_tag (
     ($i: expr, $tag: expr) => ({
-        use $crate::parser::skip_unknown_bf;
-        sep!($i, skip_unknown_bf, tag!($tag))
+        do_parse!($i,
+                 bf_skip_unknown               >>
+            res: tag!($tag)                    >>
+                 bf_skip_unknown_no_incomplete >>
+            (res)
+        )
     });
 );
 
