@@ -3,14 +3,15 @@ pub use nom::types::CompleteByteSlice;
 use ast::{Block, Node};
 use nom;
 
-use std::ops;
-
 const ALLOWED: &'static str = "<>+-.,[]";
 
 pub fn skip_unknown_bf<T>(i: T) -> nom::IResult<T, T, u32>
-    where T:            nom::InputIter+nom::InputLength+nom::Slice<ops::RangeFrom<usize>>+nom::Slice<ops::RangeTo<usize>>+nom::Slice<ops::Range<usize>>+Copy,
-          &'static str: nom::FindToken<<T as nom::InputIter>::RawItem> {
-    is_not!(i, ALLOWED).or(Ok((i, i.slice(0..0))))
+    where T:            nom::InputTake+nom::InputTakeAtPosition+Copy,
+          &'static str: nom::FindToken<<T as nom::InputTakeAtPosition>::Item> {
+    is_not!(i, ALLOWED).or_else(|e| match e {
+        nom::Err::Incomplete(size) => Err(nom::Err::Incomplete(size)),
+        _                          => Ok((i, i.take(0))),
+    })
 }
 
 macro_rules! bf_tag (
@@ -23,8 +24,8 @@ macro_rules! bf_tag (
 macro_rules! bf_named {
     (pub $name:ident<$o:ty>, $submac:ident!( $($args:tt)* )) => (
         fn $name<T>( i: T ) -> nom::IResult<T, $o, u32>
-            where T:            nom::InputIter+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+nom::Slice<ops::RangeFrom<usize>>+nom::Slice<ops::RangeTo<usize>>+nom::Slice<ops::Range<usize>>+Clone+Copy+PartialEq,
-                  &'static str: nom::FindToken<<T as nom::InputIter>::RawItem> {
+            where T:            nom::InputTake+nom::InputTakeAtPosition+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+Clone+Copy+PartialEq,
+                  &'static str: nom::FindToken<<T as nom::InputTakeAtPosition>::Item> {
             $submac!(i, $($args)*)
         }
     );
@@ -40,8 +41,8 @@ bf_named!(pub parse_loop<Node>, preceded!(bf_tag!("["), map!(many_till!(call!(no
 bf_named!(pub node<Node>,       alt!(lshift | rshift | plus | minus | dot | comma | parse_loop));
 
 pub fn parse<T>(i: T) -> Result<Block, nom::Err<T, u32>>
-    where T:            nom::InputIter+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+nom::Slice<ops::RangeFrom<usize>>+nom::Slice<ops::RangeTo<usize>>+nom::Slice<ops::Range<usize>>+Clone+Copy+PartialEq,
-          &'static str: nom::FindToken<<T as nom::InputIter>::RawItem> {
+    where T:            nom::InputTake+nom::InputTakeAtPosition+nom::InputLength+nom::AtEof+nom::Compare<&'static str>+Clone+Copy+PartialEq,
+          &'static str: nom::FindToken<<T as nom::InputTakeAtPosition>::Item> {
     do_parse!(i,
         res: map!(many0!(complete!(node)), From::from) >>
              eof!()                                    >>
@@ -62,42 +63,42 @@ mod tests {
     fn test_lshift() {
         assert_eq!(lshift(&b"<"[..]),   Ok((EMPTY, Node::LShift)));
         assert_eq!(lshift(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(lshift(&b"a<b"[..]), Ok((EMPTY, Node::LShift)));
+        assert_eq!(lshift(&b"a<b"[..]), Ok((&b"b"[..], Node::LShift)));
     }
 
     #[test]
     fn test_rshift() {
         assert_eq!(rshift(&b">"[..]),   Ok((EMPTY, Node::RShift)));
         assert_eq!(rshift(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(rshift(&b"a>b"[..]), Ok((EMPTY, Node::RShift)));
+        assert_eq!(rshift(&b"a>b"[..]), Ok((&b"b"[..], Node::RShift)));
     }
 
     #[test]
     fn test_plus() {
         assert_eq!(plus(&b"+"[..]),   Ok((EMPTY, Node::Inc)));
         assert_eq!(plus(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(plus(&b"a+b"[..]), Ok((EMPTY, Node::Inc)));
+        assert_eq!(plus(&b"a+b"[..]), Ok((&b"b"[..], Node::Inc)));
     }
 
     #[test]
     fn test_minus() {
         assert_eq!(minus(&b"-"[..]),   Ok((EMPTY, Node::Dec)));
         assert_eq!(minus(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(minus(&b"a-b"[..]), Ok((EMPTY, Node::Dec)));
+        assert_eq!(minus(&b"a-b"[..]), Ok((&b"b"[..], Node::Dec)));
     }
 
     #[test]
     fn test_dot() {
         assert_eq!(dot(&b"."[..]),   Ok((EMPTY, Node::PutCh)));
         assert_eq!(dot(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(dot(&b"a.b"[..]), Ok((EMPTY, Node::PutCh)));
+        assert_eq!(dot(&b"a.b"[..]), Ok((&b"b"[..], Node::PutCh)));
     }
 
     #[test]
     fn test_comma() {
         assert_eq!(comma(&b","[..]),   Ok((EMPTY, Node::GetCh)));
         assert_eq!(comma(&b"a"[..]),   Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(comma(&b"a,b"[..]), Ok((EMPTY, Node::GetCh)));
+        assert_eq!(comma(&b"a,b"[..]), Ok((&b"b"[..], Node::GetCh)));
     }
 
     #[test]
@@ -106,7 +107,7 @@ mod tests {
         let nodes2 = vec![Node::RShift, Node::Inc, Node::LShift, Node::PutCh];
         assert_eq!(parse_loop(&b"[>+<.]"[..]),            Ok((EMPTY, Node::Loop(From::from(nodes1)))));
         assert_eq!(parse_loop(&b"a"[..]),                 Err(nom::Err::Incomplete(Needed::Size(1))));
-        assert_eq!(parse_loop(&b"a[ b>  +e<//.'r]@"[..]), Ok((EMPTY, Node::Loop(From::from(nodes2)))));
+        assert_eq!(parse_loop(&b"a[ b>  +e<//.'r]@"[..]), Ok((&b"@"[..], Node::Loop(From::from(nodes2)))));
     }
 
     #[test]
