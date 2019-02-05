@@ -1,4 +1,4 @@
-extern crate core;
+use core;
 
 use std::convert::From;
 use std::iter::IntoIterator;

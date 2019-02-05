@@ -1,4 +1,4 @@
-use ast::{Block, Node};
+use crate::ast::{Block, Node};
 
 use std::io::{self, Read};
 
@@ -112,7 +112,7 @@ impl Default for Context {
 mod tests {
     use super::*;
 
-    use ast::Node;
+    use crate::ast::Node;
 
     #[test]
     fn test_lshift() {

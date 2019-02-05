@@ -9,7 +9,7 @@ pub enum Error {
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Error::IOError(ref err)    => write!(f, "IO Error: {}", err),
             Error::ParseError(ref err) => write!(f, "Parse Error: {}", err),
@@ -25,7 +25,7 @@ impl error::Error for Error {
         }
     }
 
-    fn cause(&self) -> Option<&error::Error> {
+    fn cause(&self) -> Option<&dyn error::Error> {
         match *self {
             Error::IOError(ref err) => Some(err),
             Error::ParseError(_)    => None,

@@ -1,5 +1,3 @@
-extern crate brainfuck;
-
 use brainfuck::context::Context;
 use brainfuck::parser;
 

@@ -1,7 +1,7 @@
 pub use nom::types::CompleteByteSlice;
 
-use ast::{Block, Node};
-use nom;
+use crate::ast::{Block, Node};
+use nom::{alt, call, complete, do_parse, eof, is_not, many0, many_till, map, preceded, tag};
 
 const ALLOWED: &'static str = "<>+-.,[]";
 
@@ -64,7 +64,7 @@ pub fn parse<T>(i: T) -> Result<Block, nom::Err<T, u32>>
 mod tests {
     use super::*;
 
-    use ast::{Block, Node};
+    use crate::ast::{Block, Node};
     use nom::{self, Needed};
 
     const EMPTY: &'static [u8] = b"";

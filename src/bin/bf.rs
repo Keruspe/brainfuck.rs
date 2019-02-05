@@ -1,5 +1,4 @@
-extern crate brainfuck;
-extern crate clap;
+#[warn(rust_2018_idioms)]
 
 use brainfuck::context::Context;
 use brainfuck::error::Result;
